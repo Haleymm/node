@@ -1,0 +1,26 @@
+
+h2 {
+    color: #f06;
+}
+#content {
+    height: 400px;
+    overflow-y: auto;
+    display: none;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+#send {
+    display: none;
+}
+.alert {
+    padding: 8px;
+}
+.con-item {
+    max-width: calc(30%);
+}
+/* .me {
+    margin-left: 200px;
+} */
+/* .me .label {
+    margin-left: calc(100% - 40px);
+} */

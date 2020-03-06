@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <mteta charset='utf-8'></mteta>
+        <title>websocket-01</title>
+    </head>
+    <body>
+        
+        <script>
+            var ws = new WebSocket('ws:localhost:9000');
+            // 监听建立连接
+            ws.onopen = function(res) {
+                console.log('连接成功');
+                console.log(res);
+            }
+            // 监听message
+            ws.onmessage = function(res){
+                console.log('收到新消息');
+                console.log(res);
+            }
+        </script>
+    </body>
+</html>

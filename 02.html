@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <mteta charset='utf-8'></mteta>
+        <title>多终端通信</title>
+    </head>
+    <body>
+        <ul id="content">
+
+        </ul>
+        <input type="text" id="msg">
+        <button onclick="send()">发送</button>
+        <script>
+            var ws = new WebSocket('ws:localhost:9001');      
+            let inputNode = document.getElementById('msg')
+            let ul = document.getElementById('content')
+
+            // 监听建立连接
+            ws.onopen = function(res) {
+                console.log('连接成功');
+                console.log(res);
+            }
+            // 接收message
+            ws.onmessage = function(res){
+                console.log('收到新消息');
+                console.log(res.data)
+                ul.innerHTML += '<li>'+res.data+'</li>';
+            }
+            function send() {
+                ws.send(inputNode.value);
+                inputNode.value = '';
+            }
+        </script>
+    </body>
+</html>

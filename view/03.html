@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>聊天室</title>
+    <!-- 直接从/static目录开始查找 -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="css/03.css" />
+</head>
+
+
+<body>
+    <div class="container" style="width:calc(40%)">
+        <h2>网页聊天室</h2>
+        <div class="row" id="login">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="username">姓名</label>
+                    <input class="form-control" id="username" placeholder="用户昵称">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="login-btn">提交</button>
+            </div>
+        </div>
+
+        <div class="row" id="content">
+            <div class="col-md-12" id="chat-content">
+            </div>
+        </div>
+        <div class="row" id="send" style="margin-top: 15px;">
+            <input style="float:left;width:calc(100% - 55px)" class="form-control" id="msg" placeholder="请输入内容">
+            <button type="submit" class="btn btn-primary" id="send-btn">发送</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket;
+
+        // 创建模板data {user:,msg:}
+        function createTpl(data, flag) {
+            var str = ''
+            // 别人
+            if (!flag) {
+                str = '<div class="con-item"><p style="margin: 8px 0 "><span class="label label-default">' + data.user
+                    + '</span></p><div class="alert alert-success" role="alert">' + data.msg
+                    + '</div></div>'
+            } else {
+                str = '<div class="con-item me"><p style="margin: 8px 0 "><span class="label label-default">' +'我'
+                    + '</span></p><div class="alert alert-danger" role="alert">' + data.msg
+                    + '</div></div>'
+            }
+            return str
+        }
+
+        $(document).ready(function () {
+            $('#login-btn').on('click', function () {
+                var uname = $.trim($('#username').val())
+                if (uname == '') { return };
+
+                $('#login').hide();
+                $('#content').show();
+                $('#send').show();
+
+                // 登录后建立双向通信连接
+                socket = io('ws://localhost:3011');
+                socket.on('connect', function () {
+                    console.log('连接成功')
+                    // 发送用户名给服务端
+                    socket.emit('login', uname);
+                })
+                // 监听服务器端的推送
+                socket.on('msg', function (data) {
+                    console.log('收到服务端发来的信息')
+                    console.log(data);
+                    // 判断是否自己
+                    var flag = data.user==uname;
+                    var tpl = createTpl(data, flag);
+
+                    console.log(tpl,flag,'tt')
+                    $('#chat-content').append(tpl)
+                })
+                socket.on('disconnect', function () {
+                    console.log('断开连接')
+                })
+
+            })
+        })
+
+        // 点击提交，发送消息到服务端
+        $('#send-btn').on('click', function () {
+            socket.emit('send', $('#msg').val())
+            $('#msg').val('')
+        })
+
+    </script>
+</body>
+
+</html>
